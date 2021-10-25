@@ -1,0 +1,228 @@
+---
+title: "Tanımlayıcı İstatistik"
+author: "H. Kemal İlter"
+date: "21.10.2021"
+output: 
+  html_document:
+    css: styles.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# libraries
+library(tidyverse)
+library(ggplot2)
+library(mosaic)
+library(e1071)
+require(tikzdevice)
+theme_set(theme_classic())
+```
+
+## Temel İstatistik
+
+Kullanılan veri seti: 
+```{r}
+veri <- read.csv('dataset-5.csv')
+veri
+# summary(veri)
+```
+
+
+**Ortalama (Mean)**
+
+Örneklemin aritmetik ortalaması, $\bar{x}$
+
+
+$$
+\bar{x} = \frac{\sum{x_i}}{n}
+$$
+
+```{r veri}
+mean(veri$x)
+```
+
+Popülasyonun aritmetik ortalaması, $\mu$
+
+$$
+\mu = \frac{\sum{x_i}}{N}
+$$
+
+**Medyan (Median)**
+
+```{r}
+median(veri$elma)
+```
+
+**Mod (Mode)**
+```{r echo=TRUE}
+# Create the function.
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+# Create the vector with numbers.
+v <- c(veri$elma)
+# Calculate the mode using the user function.
+mod <- getmode(v)
+print(mod)
+```
+
+**Yüzde değer (Percentile)**
+
+```{r echo=TRUE}
+quantile(veri$elma, c(.32, .57, .98))
+```
+
+**Çeyrek değer (Quartile)**
+
+```{r echo=TRUE}
+quantile(veri$elma)
+```
+
+**Değişim aralığı (Range)**
+
+```{r echo=TRUE}
+range(veri$elma)
+aralik <- max(veri$elma) - min(veri$elma)
+print(aralik)
+```
+
+**Çeyrekler arası değişim aralığı (Interquartile range)**
+
+```{r echo=TRUE}
+IQR(veri$elma)
+```
+**Varyans (Variance)**
+
+```{r echo=TRUE}
+var(veri$elma)
+```
+
+**Standart sapma (Standard deviation)**
+
+Popülasyonun standart sapması, $\sigma = \sqrt{\sigma^2}$
+
+Örneklemin  standart sapması, $s = \sqrt{s^2}$
+
+```{r echo=TRUE}
+sd(veri$elma)
+```
+
+**Değişkenlik katsayısı (Coefficient of variation)**
+
+$$
+\text{Değişkenlik katsayısı} = \%\left(\frac{\text{Standart sapma}}{\text{Ortalama}} \times 100 \right)
+$$
+
+```{r echo=TRUE}
+# Create the function.
+getdk <- function(d) {
+   k <- 100*(sd(d)/mean(d))
+}
+d <- c(veri$elma)
+dk <- getdk(d)
+print(dk)
+```
+
+**Çarpıklık (Skewness)**
+
+$$
+\text{Çarpıklık} = \frac{}{} \sum \left( \frac{x_i - \bar{x}}{s} \right)^3
+$$
+
+```{r echo=TRUE}
+skewness(veri$elma)
+```
+
+**z Değeri (z-Value)**
+
+```{r echo=TRUE}
+zscore(veri$elma)
+```
+
+**Frekans (Frequency)**
+
+```{r echo=TRUE}
+hist(veri$elma,plot = FALSE)
+hist(veri$elma)
+```
+
+**Stem-and-Leaf Plot**
+
+```{r echo=FALSE}
+stem(veri$elma)
+```
+
+**Plot**
+
+```{r echo=FALSE}
+plot(veri$elma[1:100],ylim=c(0,200))
+abline(h = c(mean(veri$elma),mean(veri$elma)+sd(veri$elma),mean(veri$elma)-sd(veri$elma),mean(veri$elma)+2*sd(veri$elma),mean(veri$elma)-2*sd(veri$elma)), col = c("red", "blue", "blue", "green", "green"))
+```
+
+```{r echo=FALSE}
+set.seed(1234)
+df <- data.frame(
+  agirlik=round(rnorm(1000, mean=110, sd=15))
+  )
+head(df)
+#df
+summary(df)
+ggplot(df, aes(x=agirlik)) + geom_histogram(binwidth=10)
+```
+
+**Box plot**
+
+```{r echo=FALSE}
+boxplot(veri$elma, horizontal=TRUE)
+```
+
+**Standart normal curve**
+
+```{r echo=FALSE}
+# https://thetarzan.wordpress.com/category/tikz-for-economists/
+# load tikzDevice package
+# require(tikzDevice)
+ 
+# Choose boundaries to be shaded in blue
+a = -3
+b = 0
+ 
+# creates x & y boundaries based on a and b parameters
+x.val <- c(a,seq(a,b,0.01),b) 
+y.val <- c(0,dnorm(seq(a,b,0.01)),0)
+ 
+# choose the name and location for your .tex file
+# it should be the same directory as your latex document
+#tikz( '/Users/kevingoulding/latex_documents/thesis/normal_pdf.tex' )
+ 
+# plots a normal distribution curve
+curve(dnorm(x,0,1),xlim=c(-3,3),main='The Standard Normal PDF',
+    xlab = '$x$', ylab = '$f(x)$',
+    frame.plot = FALSE, axes = FALSE)
+ 
+# shades in a polygon underneath curve
+polygon(x.val,y.val,col='gray')
+ 
+# creates blank axes
+Axis(side=1, labels=FALSE)
+Axis(side=2, labels=FALSE)
+ 
+# must turn device off to complete .tex file
+dev.off()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
